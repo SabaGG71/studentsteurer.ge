@@ -1,0 +1,68 @@
+/* The closing card's picture: how the stamp moves. A plain stylesheet with prefixed class names, like the other
+   sections'. The card itself, its entrance and the way the picture is drawn are the second section's (why.css).
+   Everything that moves sits inside a media query, so with reduced motion the stamp simply hangs over the sheet. */
+
+/* The stamp hangs --lift above the sheet. It is placed in the ground's tilted plane, where "straight up" on screen
+   is up and to the right (hence the 1.4142). */
+[data-art="stamp"] {
+  --lift: 3.3em;
+}
+
+.sst-end-stamp {
+  transform: translate(calc(var(--lift) * 1.4142), calc(var(--lift) * -1.4142));
+}
+
+/* One round: the stamp comes down at once, rests on the sheet for a moment, goes up again, and waits. */
+@keyframes sst-end-stamp {
+  0% {
+    transform: translate(calc(var(--lift) * 1.4142), calc(var(--lift) * -1.4142));
+    animation-timing-function: cubic-bezier(0.7, 0, 0.95, 0.4);
+  }
+  5.5% {
+    transform: translate(0, 0);
+    animation-timing-function: linear;
+  }
+  8.5% {
+    transform: translate(0, 0);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  17%,
+  100% {
+    transform: translate(calc(var(--lift) * 1.4142), calc(var(--lift) * -1.4142));
+  }
+}
+
+/* What the stamp leaves appears under it the first time it comes down, and stays. */
+@keyframes sst-end-ink {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+/* While it hangs, the stamp sways a little. */
+@keyframes sst-end-bob {
+  to {
+    transform: translate(0.3em, -0.3em);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sst-end-bob {
+    animation: sst-end-bob 3.2s ease-in-out infinite alternate;
+  }
+
+  /* The rounds begin once the card has come in: the stamp is on the sheet 1.23s after that, and off it again by
+     1.4s, which is when the ink has to be there. The note follows. */
+  [data-reveal="shown"] [data-art="stamp"] .sst-end-stamp {
+    animation: sst-end-stamp 6s 0.9s infinite backwards;
+  }
+
+  [data-reveal="shown"] [data-art="stamp"] .sst-end-ink {
+    animation: sst-end-ink 0.25s ease-out 1.3s backwards;
+  }
+
+  [data-reveal="shown"] [data-art="stamp"] .sst-why-tag {
+    animation: sst-why-fade 0.5s ease 1.7s backwards;
+  }
+}

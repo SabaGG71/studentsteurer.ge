@@ -400,3 +400,7 @@ export function ReturnArt({ className }: { className?: string }) {
     </Scene>
   );
 }
+
+// The pictures' parts, for the closing section's own picture (closing-art), which is drawn the same way.
+export { APRICOT, Ball, GREEN, LIME, Scene, Shade, Solid, Tag, place, project, up };
+export type { Surface };
