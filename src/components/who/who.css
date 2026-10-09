@@ -1,0 +1,66 @@
+/* The "who we can help" section: its entrance, and the pile of tags. A plain stylesheet with prefixed class names,
+   like the other sections'. What moves sits inside a media query. */
+
+/* The words rise in one after another (--d) once `Reveal` marks their parent as shown. */
+@keyframes sst-who-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A tag falls into the pile from above, turning as it lands on its own angle (--r). */
+@keyframes sst-who-drop {
+  from {
+    opacity: 0;
+    translate: 0 -170%;
+    rotate: calc(var(--r) - 16deg);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    translate: 0 0;
+    rotate: var(--r);
+  }
+}
+
+[data-reveal="armed"] :is(.sst-who-rise, .sst-who-tag) {
+  opacity: 0;
+}
+
+/* A tag lies in the pile turned by its angle. */
+.sst-who-tag {
+  rotate: var(--r);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="shown"] .sst-who-rise {
+    animation: sst-who-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 0) * 0.11s) both;
+  }
+
+  /* Only the fall's start is held on to: once a tag has landed, its own angle applies again, so pointing at it can
+     turn it. */
+  [data-reveal="shown"] .sst-who-tag {
+    animation: sst-who-drop 0.9s cubic-bezier(0.3, 1.35, 0.5, 1) calc(0.25s + var(--d, 0) * 0.13s) backwards;
+  }
+
+  .sst-who-tag {
+    transition:
+      rotate 0.35s cubic-bezier(0.34, 1.4, 0.5, 1),
+      translate 0.35s cubic-bezier(0.34, 1.4, 0.5, 1);
+  }
+}
+
+/* Pointing at a tag picks it up: it straightens, lifts and comes to the front. */
+@media (hover: hover) and (pointer: fine) {
+  .sst-who-tag:hover {
+    z-index: 5;
+    translate: 0 -0.22em;
+    rotate: 0deg;
+  }
+}

@@ -1,0 +1,22 @@
+/* The pricing section's entrance: the header's lines and the plans rise in one after another (--d) once `Reveal`
+   marks their parent as shown. A plain stylesheet with prefixed class names, like the other sections'. */
+@keyframes sst-price-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-reveal="armed"] .sst-price-rise {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="shown"] .sst-price-rise {
+    animation: sst-price-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 0) * 0.11s) both;
+  }
+}

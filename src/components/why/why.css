@@ -1,0 +1,245 @@
+/* The "why the money comes back" section: how its pictures' walls are drawn, and its motion. A plain stylesheet
+   with prefixed class names (sst-why-…), like the hero's. Everything that moves sits inside a media query, so with
+   reduced motion the pictures simply rest. */
+
+/* A wall of a solid thing: copies of its outline, each one step further down (on screen; in the ground's tilted
+   plane that is left and down, 0.12em times the square root of two). A copy only says which step it is (--i). What
+   it is painted with is said once on the wall: --wall, --ridge for every fourth copy (the milling on a coin's edge;
+   without it they are like the rest), --round, and --cut where a piece is missing. */
+.sst-why-walls,
+.sst-why-walls > span {
+  position: absolute;
+  inset: 0;
+}
+
+.sst-why-walls > span {
+  transform: translate(calc(var(--i) * -0.16971em), calc(var(--i) * 0.16971em));
+  border-radius: var(--round);
+  background: var(--wall);
+  -webkit-mask-image: var(--cut, none);
+  mask-image: var(--cut, none);
+}
+
+.sst-why-walls > span:nth-last-child(4n + 2) {
+  background: var(--ridge, var(--wall));
+}
+
+/* The entrance: the header's lines and the cards rise in one after another (--d) once `Reveal` marks their parent
+   as shown. Until then (armed) they are hidden; unmarked, they are simply there. */
+@keyframes sst-why-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The marker behind the title's words draws from left to right. */
+@keyframes sst-why-mark {
+  from {
+    transform: rotate(-1.3deg) scaleX(0);
+  }
+  to {
+    transform: rotate(-1.3deg) scaleX(1);
+  }
+}
+
+[data-reveal="armed"] .sst-why-rise {
+  opacity: 0;
+}
+
+.sst-why-mark {
+  transform: rotate(-1.3deg);
+  transform-origin: left;
+}
+
+/* The coin and the piece cut from it (the first and the third picture). Two numbers on the picture say where the
+   piece is: --out, how far it has moved away from the coin along the ground, and --lift, how high its top face is
+   above the ground. The piece, its shadow and its tag all read them, so they move as one. --seat is the --lift at
+   which the piece sits in the coin again.
+   The piece lies in the ground's tilted plane, where "straight up" on screen is up and to the right (hence the
+   1.4142); its tag stands upright, so the same move is written for it in screen terms. */
+[data-art="withheld"] {
+  --seat: 2.3em;
+  --out: 4.2em;
+  --lift: 3.2em;
+}
+
+[data-art="return"] {
+  --seat: 2.9em;
+  --out: 2.7em;
+  --lift: 3.6em;
+}
+
+.sst-why-wedge {
+  transform: translate(0, var(--out)) translate(calc(var(--lift) * 1.4142), calc(var(--lift) * -1.4142));
+}
+
+.sst-why-wedge-shade {
+  transform: translate(0.3em, calc(var(--out) + 1.3em));
+}
+
+.sst-why-follow {
+  transform: translate(calc(var(--out) * 0.7071), calc(var(--out) * 0.3536 - var(--lift)));
+}
+
+/* The calendar (the second picture): --key is how high the three worked months stand. */
+[data-art="year"] {
+  --key: 2.85em;
+}
+
+.sst-why-key {
+  transform: translate(calc(var(--key) * 1.4142), calc(var(--key) * -1.4142));
+}
+
+/* How each picture arrives, once, a moment after its card: the piece is taken out of the coin; the three months
+   drop onto the calendar one after another (--k); the piece comes in from further off. Only the start is written:
+   each ends wherever the picture then is. */
+@keyframes sst-why-take {
+  from {
+    transform: translate(0, 0) translate(calc(var(--seat) * 1.4142), calc(var(--seat) * -1.4142));
+  }
+}
+
+@keyframes sst-why-take-shade {
+  from {
+    opacity: 0;
+    transform: translate(0.3em, 1.3em);
+  }
+}
+
+@keyframes sst-why-take-tag {
+  from {
+    opacity: 0;
+    transform: translate(0, calc(var(--seat) * -1));
+  }
+}
+
+@keyframes sst-why-drop {
+  from {
+    opacity: 0;
+    transform: translate(calc((var(--key) + 3em) * 1.4142), calc((var(--key) + 3em) * -1.4142));
+  }
+}
+
+@keyframes sst-why-land {
+  from {
+    opacity: 0;
+    transform: translate(0, calc(var(--out) + 5em)) translate(calc((var(--lift) + 1.5em) * 1.4142), calc((var(--lift) + 1.5em) * -1.4142));
+  }
+}
+
+@keyframes sst-why-land-shade {
+  from {
+    opacity: 0;
+    transform: translate(0.3em, calc(var(--out) + 6.3em));
+  }
+}
+
+@keyframes sst-why-land-tag {
+  from {
+    opacity: 0;
+    transform: translate(calc((var(--out) + 5em) * 0.7071), calc((var(--out) + 5em) * 0.3536 - var(--lift) - 1.5em));
+  }
+}
+
+@keyframes sst-why-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* At rest the piece bobs a little: the same small move written for the plane and for the upright tag. */
+@keyframes sst-why-bob {
+  to {
+    transform: translate(0.5em, -0.5em);
+  }
+}
+
+@keyframes sst-why-bob-up {
+  to {
+    transform: translateY(-0.354em);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="shown"] .sst-why-rise {
+    animation: sst-why-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 0) * 0.11s) both;
+  }
+
+  [data-reveal="shown"] .sst-why-mark {
+    animation: sst-why-mark 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+  }
+
+  /* Pointing at a card moves its picture (below); these make that a long, soft ease in both directions. */
+  .sst-why-wedge,
+  .sst-why-wedge-shade,
+  .sst-why-follow {
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sst-why-key {
+    transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.5, 1) calc(var(--k, 0) * 70ms);
+  }
+
+  .sst-why-float {
+    animation: sst-why-bob 3.6s ease-in-out infinite alternate;
+  }
+
+  .sst-why-float-up {
+    animation: sst-why-bob-up 3.6s ease-in-out infinite alternate;
+  }
+
+  [data-reveal="shown"] [data-art="withheld"] .sst-why-wedge {
+    animation: sst-why-take 1.2s cubic-bezier(0.22, 1, 0.36, 1) calc(0.55s + var(--d, 0) * 0.11s) backwards;
+  }
+
+  [data-reveal="shown"] [data-art="withheld"] .sst-why-wedge-shade {
+    animation: sst-why-take-shade 1.2s cubic-bezier(0.22, 1, 0.36, 1) calc(0.55s + var(--d, 0) * 0.11s) backwards;
+  }
+
+  [data-reveal="shown"] [data-art="withheld"] .sst-why-follow {
+    animation: sst-why-take-tag 1.2s cubic-bezier(0.22, 1, 0.36, 1) calc(0.55s + var(--d, 0) * 0.11s) backwards;
+  }
+
+  [data-reveal="shown"] .sst-why-key {
+    animation: sst-why-drop 0.75s cubic-bezier(0.34, 1.4, 0.5, 1) calc(0.55s + var(--d, 0) * 0.11s + var(--k, 0) * 0.12s) backwards;
+  }
+
+  [data-reveal="shown"] [data-art="year"] .sst-why-tag {
+    animation: sst-why-fade 0.5s ease calc(1.15s + var(--d, 0) * 0.11s) backwards;
+  }
+
+  [data-reveal="shown"] [data-art="return"] .sst-why-wedge {
+    animation: sst-why-land 1.1s cubic-bezier(0.22, 1, 0.36, 1) calc(0.55s + var(--d, 0) * 0.11s) backwards;
+  }
+
+  [data-reveal="shown"] [data-art="return"] .sst-why-wedge-shade {
+    animation: sst-why-land-shade 1.1s cubic-bezier(0.22, 1, 0.36, 1) calc(0.55s + var(--d, 0) * 0.11s) backwards;
+  }
+
+  [data-reveal="shown"] [data-art="return"] .sst-why-follow {
+    animation: sst-why-land-tag 1.1s cubic-bezier(0.22, 1, 0.36, 1) calc(0.55s + var(--d, 0) * 0.11s) backwards;
+  }
+}
+
+/* Pointing at a card: the piece that was taken moves further off; the worked months stand up taller; the piece
+   that is coming back slides home and closes the coin. */
+@media (hover: hover) and (pointer: fine) {
+  .sst-why-card:hover [data-art="withheld"] {
+    --out: 5.5em;
+    --lift: 4em;
+  }
+
+  .sst-why-card:hover [data-art="year"] {
+    --key: 3.6em;
+  }
+
+  .sst-why-card:hover [data-art="return"] {
+    --out: 0em;
+    --lift: var(--seat);
+  }
+}

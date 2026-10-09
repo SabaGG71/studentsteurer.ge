@@ -1,0 +1,305 @@
+/* Motion for the hero. A plain stylesheet with prefixed class names (sst-…), not a CSS module: this project's
+   Turbopack rule hands every .css file to the Tailwind loader as global CSS, so module class names would never
+   reach the page. With reduced motion everything is simply in its finished state: every rule that moves something
+   sits inside a media query. */
+
+/* The title's lines come up out of a light blur, one after another. */
+@keyframes sst-word-in {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(0.22em);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes sst-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The marker behind the title's middle line, and the stack's leader lines: both draw from left to right. */
+@keyframes sst-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The stack. Its four layers start pressed together and move apart to their places, --gap from one to the next;
+   afterwards they breathe a little. */
+@keyframes sst-stack-open {
+  from {
+    transform: translateY(calc(var(--i) * (1.6em - var(--gap))));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes sst-breathe {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(calc((var(--i) - 1.5) * 0.24em));
+  }
+}
+
+/* What a layer's drawing does once when its step comes on. All of it happens in the layer's own tilted plane, where
+   up-and-right is "straight up" on screen. Each starts and ends as the drawing rests, so nothing jumps. */
+
+/* The ticks go pale and are ticked again with a small pop, one after another (--k). */
+@keyframes sst-tick {
+  0%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  22%,
+  48% {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+/* The stamp is lifted off the sheet and comes down on it. */
+@keyframes sst-stamp {
+  0%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  22%,
+  46% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(0.92);
+  }
+}
+
+/* The coins hop, and land with one small bounce. */
+@keyframes sst-coin {
+  0%,
+  62%,
+  100% {
+    transform: none;
+  }
+  32% {
+    transform: translate(0.8em, -0.8em);
+  }
+  80% {
+    transform: translate(0.22em, -0.22em);
+  }
+}
+
+/* The glossary under the hero: two copies of the list side by side, sliding left by exactly one copy. */
+@keyframes sst-slide {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* The scroll key's arrow: it drops out of its disc while a second one, waiting above, drops in. --drop is the
+   distance between the two, so the last frame looks exactly like the first. */
+@keyframes sst-drop {
+  0%,
+  58% {
+    transform: none;
+  }
+  88%,
+  100% {
+    transform: translateY(var(--drop));
+  }
+}
+
+/* With a mouse the layers also shift a little against each other as the pointer moves (`StackTilt` sets --mx and
+   --my on the stage, each from -1 to 1). */
+.sst-layer {
+  translate: calc(var(--mx, 0) * (var(--i) - 1.5) * -2.4px) calc(var(--my, 0) * (var(--i) - 1.5) * -1.6px);
+}
+
+/* A soft light under the card's glass. It rests in the middle; with a mouse it sits under the pointer (`StackTilt`
+   sets --sx and --sy on the stage). */
+.sst-sheen {
+  top: var(--sy, 50%);
+  left: var(--sx, 50%);
+  translate: -50% -50%;
+}
+
+/* The layers and the rows that go with them. --gap is the distance from one layer to the next and, at the same
+   time, the height of a row, which is what keeps every row level with its layer.
+   On phones the layers stand apart as four small tiles, one beside each row, so --gap is a row's height and the
+   stack is moved down until its first tile is level with the first row (--centre is where a tile's middle is).
+   From 640px up the layers overlap in a stack and the sizes come from the stack itself (hero.tsx hands them over as
+   --gap-d, --top-d and --card-d). */
+.sst-steps {
+  --gap: 4.75rem;
+  --card: 3.9rem;
+  --rows-top: 0px;
+}
+
+.sst-stack {
+  --lift: 1.1em;
+  margin-top: calc(var(--gap) / 2 - var(--centre));
+}
+
+@media (min-width: 640px) {
+  .sst-steps {
+    --gap: var(--gap-d);
+    --card: var(--card-d);
+    --rows-top: var(--top-d);
+  }
+
+  .sst-stack {
+    --lift: 0.6em;
+    margin-top: 0;
+  }
+}
+
+/* The card's four steps. `StepClock` says which one is on: it writes --step on the stage, data-on on that step's
+   row and layer, and data-state on the progress bars. Everything below is drawn from those. The clock moves on by
+   itself and pointing at a row or a layer holds its step, so every change is a transition: whatever the card was
+   doing, it eases on from there. */
+
+/* The layer whose step is on lifts. */
+.sst-slab[data-on] {
+  transform: translateY(calc(var(--lift) * -1));
+}
+
+/* Its row lights up, and the dot that joins the two turns lime. */
+.sst-row {
+  opacity: 0.7;
+}
+
+.sst-row[data-on] {
+  opacity: 1;
+}
+
+.sst-pip {
+  opacity: 0;
+}
+
+.sst-row[data-on] .sst-pip {
+  opacity: 1;
+}
+
+/* The white key rests behind that row. */
+.sst-key {
+  transform: translateY(calc(var(--gap) * var(--step, 0)));
+}
+
+/* The bars: full for the steps that are done, filling for the one that is on, empty for the rest. "Full" is written
+   in two ways that look the same, none and scaleX(1): because they are different values, a bar caught half full
+   when another step is held moves on to full at the quick pace of a done bar, instead of keeping its slow one. */
+.sst-bar {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.sst-bar[data-state="done"] {
+  transform: none;
+}
+
+.sst-bar[data-state="on"] {
+  transform: scaleX(1);
+}
+
+/* The top payslip is held up for as long as its step is on. */
+.sst-slab[data-on] .sst-art-sheet {
+  transform: translate(0.8em, -0.8em);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sst-word {
+    animation: sst-word-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) var(--at, 0s) both;
+  }
+
+  .sst-rise {
+    animation: sst-rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--at, 0s) both;
+  }
+
+  .sst-grow {
+    animation: sst-grow-x 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--at, 0s) both;
+  }
+
+  .sst-layer {
+    animation: sst-stack-open 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+  }
+
+  .sst-float {
+    animation: sst-breathe 5.5s ease-in-out 2s infinite alternate;
+  }
+
+  /* The steps: long, soft eases, so a change of step never snaps. */
+  .sst-slab,
+  .sst-key,
+  .sst-art-sheet {
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sst-row,
+  .sst-pip {
+    transition: opacity 0.45s ease;
+  }
+
+  .sst-bar {
+    transition: transform 0.35s ease;
+  }
+
+  /* The bar of the step that is on takes exactly as long as the step does (`StepClock` sets --step-ms). "reset" is
+     the instant before "on": empty at once, without easing its way there. */
+  .sst-bar[data-state="on"] {
+    transition: transform var(--step-ms, 3s) linear;
+  }
+
+  .sst-bar[data-state="reset"] {
+    transition: none;
+  }
+
+  .sst-slab[data-on] .sst-art-tick {
+    animation: sst-tick 0.8s cubic-bezier(0.3, 0, 0.3, 1) calc(0.15s + var(--k, 0) * 0.24s) both;
+  }
+
+  .sst-slab[data-on] .sst-art-stamp {
+    animation: sst-stamp 1s cubic-bezier(0.3, 0, 0.3, 1) 0.1s both;
+  }
+
+  .sst-slab[data-on] .sst-art-coin {
+    animation: sst-coin 1s cubic-bezier(0.3, 0, 0.3, 1) 0.1s both;
+  }
+
+  .sst-ticker {
+    animation: sst-slide 80s linear infinite;
+  }
+
+  .sst-ticker-pill:hover .sst-ticker {
+    animation-play-state: paused;
+  }
+
+  .sst-drop {
+    animation: sst-drop 2.6s cubic-bezier(0.65, 0, 0.35, 1) 2s infinite both;
+  }
+}
